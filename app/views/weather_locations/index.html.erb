@@ -1,0 +1,56 @@
+<div class="grid grid-rows-3 grid-flow-col gap-4 px-4 py-4 leading-10">
+  <div class="p-4 w-full bg-sky-900 rounded-xl row-span-3">
+    <h1 class="text-5xl font-bold mb-5 text-[#ffffff]">Geo Weather</h1>
+  </div>
+  <div class="p-4 w-full bg-sky-800 rounded-xl col-span-2">
+    <form hx-post="/weather_locations/load_weather_by_city" hx-trigger="submit"
+          hx-target="#coordinates" hx-swap="innerHTML">
+      <input class="px-3 py-3 text-base font-bold rounded-lg border focus:outline focus:outline-2 focus:outline-offset-2 bg-[#ffffff] text-[#0b0db1] focus:outline-[#aaaaaa] border-[#cccccc]" name="city_name" placeholder="Enter a city name, state, and country">
+      <button class="font-bold rounded-lg text-base  w-40 h-12 bg-[#0062ff] text-[#ffffff]
+      justify-center" type="submit">
+        Submit
+      </button>
+
+    </form>
+  </div>
+  <div class="p-4 w-full bg-sky-700 rounded-xl row-span-2 col-span-2">
+    <p class="text-lg font-bold mb-2 text-[#ffffff]" id="coordinates"></p>
+  </div>
+</div>
+
+
+<script>
+  // Use the browser's geolocation API to find the user's location
+  const coordinates = document.querySelector("#coordinates");
+
+  function browserFindMe() {
+    function success(position) {
+      const latitude = position.coords.latitude.toFixed(4);
+      const longitude = position.coords.longitude.toFixed(4);
+      coordinates.textContent = "Loading...";
+      fetchWeather(latitude, longitude);
+    }
+
+    function error() {
+      coordinates.textContent = "Unable to retrieve your location";
+    }
+
+    if (!navigator.geolocation) {
+      coordinates.textContent = "Geolocation is not supported by your browser";
+    } else {
+      navigator.geolocation.getCurrentPosition(success, error);
+    }
+  }
+  // Fetch weather data from the server
+  function fetchWeather(latitude, longitude) {
+    fetch(`/weather_locations/load_weather_by_coordinates?latitude=${latitude}&longitude=${longitude}`)
+      .then(response => response.text())
+      .then(data => {
+        coordinates.innerHTML = data;
+      });
+  }
+  // Run on page load
+  window.onload = function() {
+    browserFindMe();
+  };
+</script>

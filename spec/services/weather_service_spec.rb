@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'dotenv'
 
 RSpec.describe WeatherService, type: :service do
-  describe '.fetch_weather' do
+  describe '.fetch_weather_by_gps_coordinates' do
     let(:latitude) { 40.7128 }
     let(:longitude) { -74.0060 }
     let(:api_key) { 'test_api_key' }
@@ -15,18 +15,18 @@ RSpec.describe WeatherService, type: :service do
     end
 
     it 'returns parsed JSON data for valid coordinates' do
-      result = WeatherService.fetch_weather(latitude, longitude)
+      result = WeatherService.fetch_weather_by_gps_coordinates(latitude, longitude)
       expect(result).to eq(JSON.parse(response_body))
     end
 
     it 'returns nil on error' do
       stub_request(:get, url).to_return(status: 500)
-      result = WeatherService.fetch_weather(latitude, longitude)
+      result = WeatherService.fetch_weather_by_gps_coordinates(latitude, longitude)
       expect(result).to be_nil
     end
   end
 
-  describe '.fetch_weather_by_city' do
+  describe '.fetch_gps_coordinates_by_city' do
     let(:city_name) { 'New York' }
     let(:api_key) { 'test_api_key' }
     let(:url) { "http://api.openweathermap.org/geo/1.0/direct?q=#{city_name}&limit=1&appid=#{api_key}" }
@@ -38,13 +38,13 @@ RSpec.describe WeatherService, type: :service do
     end
 
     it 'returns parsed JSON data for a valid city name' do
-      result = WeatherService.fetch_weather_by_city(city_name)
+      result = WeatherService.fetch_gps_coordinates_by_city(city_name)
       expect(result).to eq(JSON.parse(response_body))
     end
 
     it 'returns nil on error' do
       stub_request(:get, url).to_return(status: 500)
-      result = WeatherService.fetch_weather_by_city(city_name)
+      result = WeatherService.fetch_gps_coordinates_by_city(city_name)
       expect(result).to be_nil
     end
   end

@@ -4,39 +4,45 @@ class WeatherLocationsController < ApplicationController
 
   def load_weather_by_coordinates
     if weather_data_in_cache(params[:latitude], params[:longitude])
-      render plain: WeatherLocation.success_html_string(@weather_data_in_cache)
-    else
-      weather_data = WeatherService.fetch_weather(params[:latitude], params[:longitude])
-      if weather_data && weather_location(weather_data)
-        if @weather_location.save
-          render plain: WeatherLocation.success_html_string(@weather_location)
-        else
-          render plain: WeatherLocation.failure_html_string
-        end
+      render partial: 'success', locals: {weather_data: @weather_data_in_cache}
+      return
+    end
+
+    weather_data = WeatherService.fetch_weather_by_gps_coordinates(params[:latitude], params[:longitude])
+
+    if weather_data && weather_location(weather_data)
+      if @weather_location.save
+        render partial: 'success', locals: {weather_data: @weather_location}
       else
-        render plain: WeatherLocation.failure_html_string
+        render partial: 'failure'
       end
+    else
+      render partial: 'failure'
     end
   end
 
   def load_weather_by_city
-    city_data = WeatherService.fetch_weather_by_city(params[:city_name])
+    city_data = WeatherService.fetch_gps_coordinates_by_city(params[:city_name])
 
-    render plain: WeatherLocation.failure_html_string unless city_data
+    unless city_data
+      render partial: 'failure'
+      return
+    end
 
     if weather_data_in_cache(city_data[0]["lat"].round(4), city_data[0]["lon"].round(4))
-      render plain: WeatherLocation.success_html_string(@weather_data_in_cache)
-    else
-      weather_data = WeatherService.fetch_weather(city_data[0]["lat"].round(4), city_data[0]["lon"].round(4))
-      if weather_data && weather_location(weather_data)
-        if @weather_location.save
-          render plain: WeatherLocation.success_html_string(@weather_location)
-        else
-          render plain: WeatherLocation.failure_html_string
-        end
+      render partial: 'success', locals: {weather_data: @weather_data_in_cache}
+      return
+    end
+
+    weather_data = WeatherService.fetch_weather_by_gps_coordinates(city_data[0]["lat"].round(4), city_data[0]["lon"].round(4))
+    if weather_data && weather_location(weather_data)
+      if @weather_location.save
+        render partial: 'success', locals: {weather_data: @weather_location}
       else
-        render plain: WeatherLocation.failure_html_string
+        render partial: 'failure'
       end
+    else
+      render partial: 'failure'
     end
   end
 

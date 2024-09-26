@@ -1,3 +1,4 @@
+# spec/models/weather_location_spec.rb
 require 'rails_helper'
 
 RSpec.describe WeatherLocation, type: :model do

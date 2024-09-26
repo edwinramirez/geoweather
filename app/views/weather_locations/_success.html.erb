@@ -1,0 +1,4 @@
+<p>Weather Data for (<%= weather_data&.latitude %>, <%= weather_data&.longitude %> )</p>
+<p>Temperature: <%= weather_data&.temperature %></p>
+<p>Weather: <%= weather_data&.weather %></p>
+<p><img src='http://openweathermap.org/img/wn/<%= weather_data&.icon %>@2x.png'></p>
